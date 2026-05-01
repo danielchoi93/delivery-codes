@@ -20,6 +20,53 @@
       transition: background 0.4s ease;
     }
 
+    /* BLANK SCREEN */
+    .blank-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    body.showing-button .blank-screen,
+    body.showing-codes .blank-screen { display: none; }
+
+    .blank-clock {
+      font-size: 96px;
+      font-weight: 600;
+      color: #ffffff;
+      letter-spacing: -3px;
+      line-height: 1;
+    }
+
+    .blank-date {
+      font-size: 20px;
+      color: #888;
+      margin-bottom: 16px;
+    }
+
+    .blank-weather {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 18px;
+      color: #666;
+    }
+
+    .blank-weather .w-temp {
+      font-size: 32px;
+      font-weight: 500;
+      color: #fff;
+    }
+
+    .blank-weather .w-divider {
+      width: 1px;
+      height: 24px;
+      background: #444;
+      margin: 0 4px;
+    }
+
     /* BUTTON SCREEN */
     .button-screen {
       display: none;
@@ -205,6 +252,13 @@
 </head>
 <body>
 
+  <!-- BLANK SCREEN (clock + weather) -->
+  <div class="blank-screen">
+    <div class="blank-clock" id="blank-clock"></div>
+    <div class="blank-date" id="blank-date"></div>
+    <div class="blank-weather" id="blank-weather"></div>
+  </div>
+
   <!-- BUTTON SCREEN -->
   <div class="button-screen">
     <div class="amazon-logo">
@@ -359,6 +413,55 @@
           document.getElementById('status').textContent = '';
         });
     }
+
+    // Clock
+    function tick() {
+      var now = new Date();
+      var h = now.getHours() % 12 || 12;
+      var m = now.getMinutes();
+      var ampm = now.getHours() >= 12 ? 'PM' : 'AM';
+      document.getElementById('blank-clock').textContent = h + ':' + (m < 10 ? '0' : '') + m + ' ' + ampm;
+      var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+      var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      document.getElementById('blank-date').textContent = days[now.getDay()] + ', ' + months[now.getMonth()] + ' ' + now.getDate();
+    }
+    tick();
+    setInterval(tick, 1000);
+
+    // Weather via wttr.in
+    function fetchWeather() {
+      fetch('https://wttr.in/La+Mirada,CA?format=j1')
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          var current = data.current_condition[0];
+          var tempF = current.temp_F;
+          var desc = current.weatherDesc[0].value;
+          var icon = getWeatherIcon(current.weatherCode);
+          document.getElementById('blank-weather').innerHTML =
+            '<span style="font-size:28px">' + icon + '</span>' +
+            '<span class="w-temp">' + tempF + '°F</span>' +
+            '<div class="w-divider"></div>' +
+            '<span>' + desc + ' · La Mirada</span>';
+        })
+        .catch(function() {
+          document.getElementById('blank-weather').innerHTML = '<span>La Mirada, CA</span>';
+        });
+    }
+
+    function getWeatherIcon(code) {
+      code = parseInt(code);
+      if (code === 113) return '☀️';
+      if (code === 116) return '⛅';
+      if (code === 119 || code === 122) return '☁️';
+      if (code >= 176 && code <= 263) return '🌦️';
+      if (code >= 266 && code <= 321) return '🌧️';
+      if (code >= 323 && code <= 395) return '🌨️';
+      if (code >= 386 && code <= 395) return '⛈️';
+      return '🌡️';
+    }
+
+    fetchWeather();
+    setInterval(fetchWeather, 10 * 60 * 1000);
 
     checkCodes();
     setInterval(checkCodes, 60000);
