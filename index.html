@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, orientation=landscape">
   <title>Delivery Codes</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
@@ -15,12 +15,12 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 2rem 1rem;
+      padding: 1.5rem 2rem;
       background: #1c1c1e;
       transition: background 0.4s ease;
     }
 
-    /* BUTTON SCREEN - codes are available */
+    /* BUTTON SCREEN */
     .button-screen {
       display: none;
       flex-direction: column;
@@ -29,7 +29,7 @@
     }
 
     .button-screen .amazon-logo img {
-      height: 40px;
+      height: 44px;
       filter: brightness(0) invert(1);
       opacity: 0.85;
     }
@@ -38,11 +38,11 @@
       background: #FF9900;
       color: #111;
       font-family: 'DM Sans', sans-serif;
-      font-size: 18px;
+      font-size: 22px;
       font-weight: 600;
       border: none;
       border-radius: 50px;
-      padding: 1rem 2.25rem;
+      padding: 1.1rem 2.75rem;
       cursor: pointer;
       letter-spacing: -0.01em;
       transition: transform 0.15s ease, background 0.15s ease;
@@ -57,9 +57,9 @@
     .codes-screen {
       display: none;
       width: 100%;
+      max-width: 1100px;
       flex-direction: column;
       align-items: center;
-      padding-top: 2rem;
     }
 
     body.showing-codes {
@@ -73,56 +73,69 @@
     body.showing-button .button-screen { display: flex; }
     body.showing-button .codes-screen { display: none; }
 
-    .amazon-logo {
-      margin-bottom: 1.25rem;
-      text-align: center;
+    /* HEADER ROW */
+    .top-bar {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 0 0.75rem;
+      border-bottom: 1px solid #ebebeb;
+      margin-bottom: 1rem;
     }
 
-    .amazon-logo img { height: 36px; }
+    .top-bar .amazon-logo img { height: 30px; }
 
-    .header {
+    .top-bar-center {
       text-align: center;
-      margin-bottom: 2rem;
     }
 
     .dot {
       display: inline-block;
-      width: 9px; height: 9px;
+      width: 8px; height: 8px;
       border-radius: 50%;
       background: #2ecc71;
-      margin-right: 7px;
+      margin-right: 6px;
       vertical-align: middle;
     }
 
-    .today { font-size: 14px; color: #999; margin-bottom: 6px; }
+    .today { font-size: 13px; color: #999; margin-bottom: 2px; }
 
     .title-main {
-      font-size: 26px;
+      font-size: 22px;
       font-weight: 600;
       color: #111;
       letter-spacing: -0.02em;
-      margin-bottom: 3px;
     }
 
     .title-sub {
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 500;
       color: #bbb;
       letter-spacing: 0.14em;
       text-transform: uppercase;
     }
 
+    .page-indicator {
+      font-size: 13px;
+      color: #aaa;
+      min-width: 80px;
+      text-align: right;
+    }
+
+    /* CARDS GRID - landscape: 2 columns */
     .cards {
       width: 100%;
       display: grid;
-      gap: 0.75rem;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.6rem;
     }
 
     .card {
       background: #f7f7f7;
       border: 1px solid #ebebeb;
-      border-radius: 16px;
-      padding: 1.5rem;
+      border-radius: 14px;
+      padding: 1rem 1.5rem;
       text-align: center;
       display: flex;
       align-items: center;
@@ -132,7 +145,7 @@
     }
 
     .name { font-weight: 600; color: #111; }
-    .separator { color: #bbb; font-weight: 300; margin: 0 0.25em; }
+    .separator { color: #bbb; font-weight: 300; margin: 0 0.3em; }
     .code {
       font-weight: 600;
       color: #111;
@@ -140,9 +153,37 @@
       font-variant-numeric: tabular-nums;
     }
 
+    /* PAGINATION */
+    .pagination {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 0.75rem;
+      min-height: 52px;
+    }
+
+    .page-btn {
+      background: #111;
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      border: none;
+      border-radius: 50px;
+      padding: 0.65rem 1.75rem;
+      cursor: pointer;
+      transition: transform 0.15s ease, background 0.15s ease;
+      visibility: hidden;
+    }
+
+    .page-btn.visible { visibility: visible; }
+    .page-btn:active { transform: scale(0.97); background: #333; }
+
+    /* STATUS + COUNTDOWN */
     .status {
       position: fixed;
-      bottom: 1rem;
+      bottom: 0.75rem;
       right: 1rem;
       font-size: 11px;
       color: #444;
@@ -164,7 +205,7 @@
 </head>
 <body>
 
-  <!-- BUTTON SCREEN (shown when codes are available) -->
+  <!-- BUTTON SCREEN -->
   <div class="button-screen">
     <div class="amazon-logo">
       <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="Amazon">
@@ -174,15 +215,24 @@
 
   <!-- CODES SCREEN -->
   <div class="codes-screen">
-    <div class="amazon-logo">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="Amazon">
+    <div class="top-bar">
+      <div class="amazon-logo">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="Amazon">
+      </div>
+      <div class="top-bar-center">
+        <div class="today"><span class="dot"></span><span id="today-text"></span></div>
+        <div class="title-main">One-Time Password</div>
+        <div class="title-sub">Delivery Codes</div>
+      </div>
+      <div class="page-indicator" id="page-indicator"></div>
     </div>
-    <div class="header">
-      <div class="today"><span class="dot"></span><span id="today-text"></span></div>
-      <div class="title-main">One-Time Password</div>
-      <div class="title-sub">Delivery Codes</div>
-    </div>
+
     <div class="cards" id="cards"></div>
+
+    <div class="pagination">
+      <button class="page-btn" id="prev-btn" onclick="changePage(-1)">← Prev Page</button>
+      <button class="page-btn" id="next-btn" onclick="changePage(1)">Next Page →</button>
+    </div>
   </div>
 
   <div class="status" id="status">checking...</div>
@@ -191,20 +241,68 @@
   <script>
     var GAS_URL = 'https://script.google.com/macros/s/AKfycbzFRcUINLVndvIHar-ul28an2R8rzK6koqUB-_DfvLV4Q_9HuRsNKU57tNK1Tuw-gj_WQ/exec';
     var RETURN_AFTER_MS = 10 * 60 * 1000;
+    var PER_PAGE = 8;
     var autoReturnTimer = null;
     var cachedCodes = [];
     var cachedToday = '';
+    var currentPage = 0;
 
     function getFontSize(count) {
-      if (count === 1) return '72px';
-      if (count === 2) return '54px';
-      if (count === 3) return '40px';
-      if (count === 4) return '32px';
-      return '24px';
+      if (count <= 2) return '36px';
+      if (count <= 4) return '28px';
+      if (count <= 6) return '24px';
+      return '20px';
     }
 
-    function getCols(count) {
-      return count <= 5 ? count : Math.ceil(count / 2);
+    function renderPage() {
+      var codes = cachedCodes;
+      var totalPages = Math.ceil(codes.length / PER_PAGE);
+      var start = currentPage * PER_PAGE;
+      var pageCodes = codes.slice(start, start + PER_PAGE);
+      var count = pageCodes.length;
+
+      var fs = getFontSize(count);
+      var cards = document.getElementById('cards');
+
+      var html = '';
+      for (var i = 0; i < pageCodes.length; i++) {
+        var spaced = pageCodes[i].code.split('').join(' ');
+        html += '<div class="card" style="font-size:' + fs + '">' +
+          '<span class="name">' + pageCodes[i].name + '</span>' +
+          '<span class="separator"> — </span>' +
+          '<span class="code">' + spaced + '</span>' +
+        '</div>';
+      }
+      cards.innerHTML = html;
+
+      // Page indicator
+      if (totalPages > 1) {
+        document.getElementById('page-indicator').textContent = 'Page ' + (currentPage + 1) + ' of ' + totalPages;
+      } else {
+        document.getElementById('page-indicator').textContent = '';
+      }
+
+      // Prev button
+      var prevBtn = document.getElementById('prev-btn');
+      if (currentPage > 0) {
+        prevBtn.classList.add('visible');
+      } else {
+        prevBtn.classList.remove('visible');
+      }
+
+      // Next button
+      var nextBtn = document.getElementById('next-btn');
+      if (currentPage < totalPages - 1) {
+        nextBtn.classList.add('visible');
+      } else {
+        nextBtn.classList.remove('visible');
+      }
+    }
+
+    function changePage(dir) {
+      var totalPages = Math.ceil(cachedCodes.length / PER_PAGE);
+      currentPage = Math.max(0, Math.min(totalPages - 1, currentPage + dir));
+      renderPage();
     }
 
     function startCountdown() {
@@ -223,27 +321,10 @@
     }
 
     function showCodes() {
-      var codes = cachedCodes;
-      var count = codes.length;
+      currentPage = 0;
       document.body.className = 'showing-codes';
-
       document.getElementById('today-text').textContent = cachedToday;
-
-      var fs = getFontSize(count);
-      var cols = getCols(count);
-      var cards = document.getElementById('cards');
-      cards.style.gridTemplateColumns = 'repeat(' + cols + ', 1fr)';
-
-      var html = '';
-      for (var i = 0; i < codes.length; i++) {
-        var spaced = codes[i].code.split('').join(' ');
-        html += '<div class="card" style="font-size:' + fs + '">' +
-          '<span class="name">' + codes[i].name + '</span>' +
-          '<span class="separator"> — </span>' +
-          '<span class="code">' + spaced + '</span>' +
-        '</div>';
-      }
-      cards.innerHTML = html;
+      renderPage();
 
       var now = new Date();
       var h = now.getHours() % 12 || 12;
@@ -264,12 +345,10 @@
           document.getElementById('status').textContent = '';
 
           if (cachedCodes.length > 0) {
-            // Only switch to button screen if not currently showing codes
             if (document.body.className !== 'showing-codes') {
               document.body.className = 'showing-button';
             }
           } else {
-            // No codes — blank dark screen
             if (document.body.className !== 'showing-codes') {
               document.body.className = '';
             }
