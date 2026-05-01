@@ -14,34 +14,71 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
       padding: 2rem 1rem;
-      background: #ffffff;
+      background: #1c1c1e;
       transition: background 0.4s ease;
     }
 
-    body.no-codes {
-      background: #1c1c1e;
+    /* BUTTON SCREEN - codes are available */
+    .button-screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
     }
 
-    .content {
+    .button-screen .amazon-logo img {
+      height: 40px;
+      filter: brightness(0) invert(1);
+      opacity: 0.85;
+    }
+
+    .home-btn {
+      background: #FF9900;
+      color: #111;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 18px;
+      font-weight: 600;
+      border: none;
+      border-radius: 50px;
+      padding: 1rem 2.25rem;
+      cursor: pointer;
+      letter-spacing: -0.01em;
+      transition: transform 0.15s ease, background 0.15s ease;
+    }
+
+    .home-btn:active {
+      transform: scale(0.97);
+      background: #e88a00;
+    }
+
+    /* CODES SCREEN */
+    .codes-screen {
       display: none;
       width: 100%;
       flex-direction: column;
       align-items: center;
+      padding-top: 2rem;
     }
 
-    body.has-codes .content {
-      display: flex;
+    body.showing-codes {
+      background: #ffffff;
+      justify-content: flex-start;
     }
+
+    body.showing-codes .codes-screen { display: flex; }
+    body.showing-codes .button-screen { display: none; }
+
+    body.showing-button .button-screen { display: flex; }
+    body.showing-button .codes-screen { display: none; }
 
     .amazon-logo {
       margin-bottom: 1.25rem;
       text-align: center;
     }
 
-    .amazon-logo img {
-      height: 36px;
-    }
+    .amazon-logo img { height: 36px; }
 
     .header {
       text-align: center;
@@ -57,11 +94,7 @@
       vertical-align: middle;
     }
 
-    .today {
-      font-size: 14px;
-      color: #999;
-      margin-bottom: 6px;
-    }
+    .today { font-size: 14px; color: #999; margin-bottom: 6px; }
 
     .title-main {
       font-size: 26px;
@@ -98,17 +131,8 @@
       gap: 0.2rem;
     }
 
-    .name {
-      font-weight: 600;
-      color: #111;
-    }
-
-    .separator {
-      color: #bbb;
-      font-weight: 300;
-      margin: 0 0.25em;
-    }
-
+    .name { font-weight: 600; color: #111; }
+    .separator { color: #bbb; font-weight: 300; margin: 0 0.25em; }
     .code {
       font-weight: 600;
       color: #111;
@@ -121,18 +145,35 @@
       bottom: 1rem;
       right: 1rem;
       font-size: 11px;
-      color: #ccc;
+      color: #444;
       font-family: monospace;
     }
 
-    body.no-codes .status {
-      color: #444;
+    body.showing-codes .status { color: #ccc; }
+
+    .countdown-bar {
+      position: fixed;
+      bottom: 0; left: 0;
+      height: 3px;
+      background: #FF9900;
+      width: 100%;
+      transform-origin: left;
+      display: none;
     }
   </style>
 </head>
-<body class="no-codes">
+<body>
 
-  <div class="content">
+  <!-- BUTTON SCREEN (shown when codes are available) -->
+  <div class="button-screen">
+    <div class="amazon-logo">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="Amazon">
+    </div>
+    <button class="home-btn" onclick="showCodes()">Click here for Amazon Delivery Codes</button>
+  </div>
+
+  <!-- CODES SCREEN -->
+  <div class="codes-screen">
     <div class="amazon-logo">
       <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="Amazon">
     </div>
@@ -145,9 +186,14 @@
   </div>
 
   <div class="status" id="status">checking...</div>
+  <div class="countdown-bar" id="countdown-bar"></div>
 
   <script>
     var GAS_URL = 'https://script.google.com/macros/s/AKfycbzFRcUINLVndvIHar-ul28an2R8rzK6koqUB-_DfvLV4Q_9HuRsNKU57tNK1Tuw-gj_WQ/exec';
+    var RETURN_AFTER_MS = 10 * 60 * 1000;
+    var autoReturnTimer = null;
+    var cachedCodes = [];
+    var cachedToday = '';
 
     function getFontSize(count) {
       if (count === 1) return '72px';
@@ -161,54 +207,82 @@
       return count <= 5 ? count : Math.ceil(count / 2);
     }
 
-    function update() {
-      document.getElementById('status').textContent = 'updating...';
+    function startCountdown() {
+      var bar = document.getElementById('countdown-bar');
+      bar.style.display = 'block';
+      bar.style.transition = 'none';
+      bar.style.transform = 'scaleX(1)';
+      bar.offsetHeight;
+      bar.style.transition = 'transform ' + (RETURN_AFTER_MS / 1000) + 's linear';
+      bar.style.transform = 'scaleX(0)';
+      autoReturnTimer = setTimeout(function() {
+        document.body.className = 'showing-button';
+        bar.style.display = 'none';
+        document.getElementById('status').textContent = '';
+      }, RETURN_AFTER_MS);
+    }
 
+    function showCodes() {
+      var codes = cachedCodes;
+      var count = codes.length;
+      document.body.className = 'showing-codes';
+
+      document.getElementById('today-text').textContent = cachedToday;
+
+      var fs = getFontSize(count);
+      var cols = getCols(count);
+      var cards = document.getElementById('cards');
+      cards.style.gridTemplateColumns = 'repeat(' + cols + ', 1fr)';
+
+      var html = '';
+      for (var i = 0; i < codes.length; i++) {
+        var spaced = codes[i].code.split('').join(' ');
+        html += '<div class="card" style="font-size:' + fs + '">' +
+          '<span class="name">' + codes[i].name + '</span>' +
+          '<span class="separator"> — </span>' +
+          '<span class="code">' + spaced + '</span>' +
+        '</div>';
+      }
+      cards.innerHTML = html;
+
+      var now = new Date();
+      var h = now.getHours() % 12 || 12;
+      var m = (now.getMinutes() < 10 ? '0' : '') + now.getMinutes();
+      var ampm = now.getHours() >= 12 ? 'PM' : 'AM';
+      document.getElementById('status').textContent = 'last updated ' + h + ':' + m + ' ' + ampm;
+
+      clearTimeout(autoReturnTimer);
+      startCountdown();
+    }
+
+    function checkCodes() {
       fetch(GAS_URL + '?json=1')
         .then(function(r) { return r.json(); })
         .then(function(data) {
-          var codes = data.codes;
-          var count = codes.length;
+          cachedCodes = data.codes;
+          cachedToday = data.today;
+          document.getElementById('status').textContent = '';
 
-          if (count === 0) {
-            document.body.className = 'no-codes';
-            document.getElementById('status').textContent = 'no codes today';
-          } else {
-            document.body.className = 'has-codes';
-            document.getElementById('today-text').textContent = data.today;
-
-            var fs = getFontSize(count);
-            var cols = getCols(count);
-            var cards = document.getElementById('cards');
-            cards.style.gridTemplateColumns = 'repeat(' + cols + ', 1fr)';
-
-            var html = '';
-            for (var i = 0; i < codes.length; i++) {
-              var spaced = codes[i].code.split('').join(' ');
-              html += '<div class="card" style="font-size:' + fs + '">' +
-                '<span class="name">' + codes[i].name + '</span>' +
-                '<span class="separator"> — </span>' +
-                '<span class="code">' + spaced + '</span>' +
-              '</div>';
+          if (cachedCodes.length > 0) {
+            // Only switch to button screen if not currently showing codes
+            if (document.body.className !== 'showing-codes') {
+              document.body.className = 'showing-button';
             }
-            cards.innerHTML = html;
-
-            var now = new Date();
-            var timeStr = now.getHours() % 12 || 12;
-            timeStr += ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes();
-            timeStr += now.getHours() >= 12 ? ' PM' : ' AM';
-            document.getElementById('status').textContent = 'last updated ' + timeStr;
+          } else {
+            // No codes — blank dark screen
+            if (document.body.className !== 'showing-codes') {
+              document.body.className = '';
+            }
           }
         })
         .catch(function(err) {
-          document.getElementById('status').textContent = 'retrying...';
           console.log('fetch error:', err);
+          document.getElementById('status').textContent = '';
         });
     }
 
-    // Run immediately, then every 60 seconds
-    update();
-    setInterval(update, 60000);
+    checkCodes();
+    setInterval(checkCodes, 60000);
   </script>
 
 </body>
