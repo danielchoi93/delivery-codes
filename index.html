@@ -146,17 +146,17 @@
       vertical-align: middle;
     }
 
-    .today { font-size: 13px; color: #999; margin-bottom: 2px; }
+    .today { font-size: 16px; color: #999; margin-bottom: 2px; }
 
     .title-main {
-      font-size: 22px;
+      font-size: 28px;
       font-weight: 600;
       color: #111;
       letter-spacing: -0.02em;
     }
 
     .title-sub {
-      font-size: 11px;
+      font-size: 14px;
       font-weight: 500;
       color: #bbb;
       letter-spacing: 0.14em;
@@ -164,7 +164,7 @@
     }
 
     .page-indicator {
-      font-size: 13px;
+      font-size: 16px;
       color: #aaa;
       min-width: 80px;
       text-align: right;
@@ -173,9 +173,6 @@
     /* CARDS GRID - landscape: 2 columns */
     .cards {
       width: 100%;
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 0.6rem;
     }
 
     .card {
@@ -214,11 +211,11 @@
       background: #111;
       color: #fff;
       font-family: 'DM Sans', sans-serif;
-      font-size: 15px;
+      font-size: 20px;
       font-weight: 600;
       border: none;
       border-radius: 50px;
-      padding: 0.65rem 1.75rem;
+      padding: 0.75rem 2rem;
       cursor: pointer;
       transition: transform 0.15s ease, background 0.15s ease;
       visibility: hidden;
@@ -295,17 +292,25 @@
   <script>
     var GAS_URL = 'https://script.google.com/macros/s/AKfycbzFRcUINLVndvIHar-ul28an2R8rzK6koqUB-_DfvLV4Q_9HuRsNKU57tNK1Tuw-gj_WQ/exec';
     var RETURN_AFTER_MS = 10 * 60 * 1000;
-    var PER_PAGE = 8;
+    var PER_PAGE = 6;
     var autoReturnTimer = null;
     var cachedCodes = [];
     var cachedToday = '';
     var currentPage = 0;
 
     function getFontSize(count) {
-      if (count <= 2) return '36px';
-      if (count <= 4) return '28px';
-      if (count <= 6) return '24px';
-      return '20px';
+      if (count <= 2) return '48px';
+      if (count <= 4) return '38px';
+      return '30px';
+    }
+
+    function makeCard(item, fs) {
+      var spaced = item.code.split('').join(' ');
+      return '<div class="card" style="font-size:' + fs + '">' +
+        '<span class="name">' + item.name + '</span>' +
+        '<span class="separator"> — </span>' +
+        '<span class="code">' + spaced + '</span>' +
+      '</div>';
     }
 
     function renderPage() {
@@ -319,14 +324,60 @@
       var cards = document.getElementById('cards');
 
       var html = '';
-      for (var i = 0; i < pageCodes.length; i++) {
-        var spaced = pageCodes[i].code.split('').join(' ');
-        html += '<div class="card" style="font-size:' + fs + '">' +
-          '<span class="name">' + pageCodes[i].name + '</span>' +
-          '<span class="separator"> — </span>' +
-          '<span class="code">' + spaced + '</span>' +
+
+      if (count === 1) {
+        // Single card centered
+        html = '<div style="display:grid;grid-template-columns:1fr;max-width:50%;margin:0 auto;">' +
+          makeCard(pageCodes[0], fs) +
         '</div>';
+
+      } else if (count === 2) {
+        // Two cards side by side
+        html = '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:0.6rem;width:100%;">' +
+          makeCard(pageCodes[0], fs) +
+          makeCard(pageCodes[1], fs) +
+        '</div>';
+
+      } else if (count === 3) {
+        // 2 on top, 1 centered bottom
+        html = '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:0.6rem;width:100%;margin-bottom:0.6rem;">' +
+          makeCard(pageCodes[0], fs) +
+          makeCard(pageCodes[1], fs) +
+        '</div>' +
+        '<div style="display:grid;grid-template-columns:1fr;max-width:50%;margin:0 auto;">' +
+          makeCard(pageCodes[2], fs) +
+        '</div>';
+
+      } else if (count === 4) {
+        // 2x2
+        html = '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:0.6rem;width:100%;">' +
+          makeCard(pageCodes[0], fs) +
+          makeCard(pageCodes[1], fs) +
+          makeCard(pageCodes[2], fs) +
+          makeCard(pageCodes[3], fs) +
+        '</div>';
+
+      } else if (count === 5) {
+        // 2+2 top, 1 centered bottom
+        html = '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:0.6rem;width:100%;margin-bottom:0.6rem;">' +
+          makeCard(pageCodes[0], fs) +
+          makeCard(pageCodes[1], fs) +
+          makeCard(pageCodes[2], fs) +
+          makeCard(pageCodes[3], fs) +
+        '</div>' +
+        '<div style="display:grid;grid-template-columns:1fr;max-width:50%;margin:0 auto;">' +
+          makeCard(pageCodes[4], fs) +
+        '</div>';
+
+      } else {
+        // 6 — 2x3
+        html = '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:0.6rem;width:100%;">';
+        for (var i = 0; i < pageCodes.length; i++) {
+          html += makeCard(pageCodes[i], fs);
+        }
+        html += '</div>';
       }
+
       cards.innerHTML = html;
 
       // Page indicator
