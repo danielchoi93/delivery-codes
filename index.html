@@ -100,10 +100,12 @@
       font-size: 38px;
       font-weight: 700;
       border: none;
-      border-radius: 50px;
+      border-radius: 30px;
       padding: 1.5rem 3.5rem;
       cursor: pointer;
       letter-spacing: -0.01em;
+      text-align: center;
+      max-width: 80vw;
       transition: transform 0.15s ease, background 0.15s ease;
     }
 
@@ -316,9 +318,10 @@
     var currentPage = 0;
 
     function getFontSize(count) {
-      if (count <= 2) return '32px';
-      if (count <= 4) return '26px';
-      return '22px';
+      if (count === 1) return '32px';
+      if (count === 2) return '26px';
+      if (count === 3) return '22px';
+      return '20px';
     }
 
     function makeCard(item, fs) {
@@ -339,34 +342,27 @@
 
       var fs = getFontSize(count);
       var cards = document.getElementById('cards');
-
       var html = '';
 
       if (count === 1) {
-        // Single card centered
-        html = '<div style="display:grid;grid-template-columns:1fr;max-width:50%;margin:0 auto;">' +
+        html = '<div style="display:grid;grid-template-columns:1fr;max-width:75%;margin:0 auto;">' +
           makeCard(pageCodes[0], fs) +
         '</div>';
 
       } else if (count === 2) {
-        // Two cards side by side
-        html = '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:0.6rem;width:100%;">' +
+        html = '<div style="display:grid;grid-template-columns:1fr;gap:0.6rem;width:100%;">' +
           makeCard(pageCodes[0], fs) +
           makeCard(pageCodes[1], fs) +
         '</div>';
 
       } else if (count === 3) {
-        // 2 on top, 1 centered bottom
-        html = '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:0.6rem;width:100%;margin-bottom:0.6rem;">' +
+        html = '<div style="display:grid;grid-template-columns:1fr;gap:0.6rem;width:100%;">' +
           makeCard(pageCodes[0], fs) +
           makeCard(pageCodes[1], fs) +
-        '</div>' +
-        '<div style="display:grid;grid-template-columns:1fr;max-width:50%;margin:0 auto;">' +
           makeCard(pageCodes[2], fs) +
         '</div>';
 
       } else if (count === 4) {
-        // 2x2
         html = '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:0.6rem;width:100%;">' +
           makeCard(pageCodes[0], fs) +
           makeCard(pageCodes[1], fs) +
@@ -375,19 +371,17 @@
         '</div>';
 
       } else if (count === 5) {
-        // 2+2 top, 1 centered bottom
         html = '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:0.6rem;width:100%;margin-bottom:0.6rem;">' +
           makeCard(pageCodes[0], fs) +
           makeCard(pageCodes[1], fs) +
           makeCard(pageCodes[2], fs) +
           makeCard(pageCodes[3], fs) +
         '</div>' +
-        '<div style="display:grid;grid-template-columns:1fr;max-width:50%;margin:0 auto;">' +
+        '<div style="display:grid;grid-template-columns:1fr;max-width:75%;margin:0 auto;">' +
           makeCard(pageCodes[4], fs) +
         '</div>';
 
       } else {
-        // 6 — 2x3
         html = '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:0.6rem;width:100%;">';
         for (var i = 0; i < pageCodes.length; i++) {
           html += makeCard(pageCodes[i], fs);
