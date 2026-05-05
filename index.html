@@ -72,20 +72,19 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      gap: 2rem;
       width: 100%;
       height: 100vh;
+      padding: 0 4rem;
     }
 
     .button-screen .amazon-logo {
-      flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    .button-screen .btn-spacer {
-      flex: 1;
-    }
+    .button-screen .btn-spacer { display: none; }
 
     .button-screen .amazon-logo img {
       height: 70px;
@@ -100,12 +99,12 @@
       font-size: 38px;
       font-weight: 700;
       border: none;
-      border-radius: 30px;
+      border-radius: 50px;
       padding: 1.5rem 3.5rem;
       cursor: pointer;
       letter-spacing: -0.01em;
-      text-align: center;
-      max-width: 80vw;
+      white-space: nowrap;
+      width: 100%;
       transition: transform 0.15s ease, background 0.15s ease;
     }
 
@@ -318,10 +317,10 @@
     var currentPage = 0;
 
     function getFontSize(count) {
-      if (count === 1) return '32px';
-      if (count === 2) return '26px';
-      if (count === 3) return '22px';
-      return '20px';
+      if (count === 1) return '42px';
+      if (count === 2) return '34px';
+      if (count === 3) return '28px';
+      return '24px';
     }
 
     function makeCard(item, fs) {
