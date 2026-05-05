@@ -70,13 +70,18 @@
     /* BUTTON SCREEN */
     .button-screen {
       display: none;
-      flex-direction: column;
       align-items: center;
-      gap: 1.5rem;
+      justify-content: center;
+      position: relative;
+    }
+
+    .button-screen .amazon-logo {
+      position: absolute;
+      top: calc(50% - 140px);
     }
 
     .button-screen .amazon-logo img {
-      height: 150px;
+      height: 70px;
       filter: brightness(0) invert(1);
       opacity: 0.85;
     }
