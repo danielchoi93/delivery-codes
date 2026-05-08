@@ -79,7 +79,7 @@
       align-items: center;
       height: calc(100vh - 42px);
       width: 100%;
-      padding: 0 4rem;
+      padding: 30px 4rem 0;
     }
 
     body.showing-button .button-screen {
@@ -468,6 +468,15 @@
         .then(function(r) { return r.json(); })
         .then(function(data) {
           cachedCodes = data.codes;
+
+          // Remove duplicates where both name AND code are identical
+          var seen = {};
+          cachedCodes = cachedCodes.filter(function(item) {
+            var key = item.name.trim().toLowerCase() + '|' + item.code.trim();
+            if (seen[key]) return false;
+            seen[key] = true;
+            return true;
+          });
           cachedToday = data.today;
           document.getElementById('status').textContent = '';
 
